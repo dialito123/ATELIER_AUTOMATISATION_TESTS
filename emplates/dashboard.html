@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>QoS & API Dashboard</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; background: #f8fafc; color: #1e293b; }
+        .container { max-width: 900px; margin: auto; }
+        .btn { background: #0284c7; color: white; padding: 8px 16px; text-decoration: none; border-radius: 6px; font-weight: bold; }
+        .grid { display: flex; gap: 1rem; margin: 1rem 0 2rem 0; }
+        .card { flex: 1; background: white; padding: 1rem; border-radius: 8px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-bottom: 2rem; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th { background: #f1f5f9; }
+        .pass { color: #16a34a; font-weight: bold; }
+        .fail { color: #dc2626; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h1>Monitoring API — Frankfurter</h1>
+            <a href="/run" class="btn">Lancer un run de tests</a>
+        </div>
+
+        {% if last_run %}
+        <h3>Dernier Run : {{ last_run.timestamp }}</h3>
+        <div class="grid">
+            <div class="card">Tests : {{ last_run.passed }} / {{ last_run.passed + last_run.failed }}</div>
+            <div class="card">Taux d'erreur : {{ last_run.error_rate }}%</div>
+            <div class="card">Latence Moy. : {{ last_run.latency_avg }} ms</div>
+            <div class="card">Latence P95 : {{ last_run.latency_p95 }} ms</div>
+        </div>
+
+        <table>
+            <thead><tr><th>Test</th><th>Statut</th><th>Latence</th><th>Détails</th></tr></thead>
+            <tbody>
+                {% for t in last_run.tests %}
+                <tr>
+                    <td>{{ t.name }}</td>
+                    <td class="{{ 'pass' if t.status == 'PASS' else 'fail' }}">{{ t.status }}</td>
+                    <td>{{ t.latency_ms }} ms</td>
+                    <td>{{ t.details }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+        <h3>Historique des exécutions</h3>
+        <table>
+            <thead><tr><th>#ID</th><th>Date</th><th>Réussis</th><th>Échecs</th><th>Latence Moy.</th></tr></thead>
+            <tbody>
+                {% for r in runs %}
+                <tr>
+                    <td>#{{ r.id }}</td>
+                    <td>{{ r.timestamp }}</td>
+                    <td>{{ r.passed }}</td>
+                    <td>{{ r.failed }}</td>
+                    <td>{{ r.latency_avg }} ms</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
