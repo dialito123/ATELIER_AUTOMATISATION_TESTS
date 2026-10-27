@@ -3,11 +3,11 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 from flask import Flask, jsonify, render_template
-from tester.runner import execute_test_suite
+from tester import execute_test_suite
 
 app = Flask(__name__)
 
-# --- GESTION SQLITE INTÉGRÉE ---
+# --- GESTION SQLITE ---
 DB_FILE = Path(__file__).resolve().parent / "runs.db"
 
 
@@ -80,17 +80,18 @@ def list_runs(limit: int = 10):
     ]
 
 
-# Initialisation de la table au démarrage
 init_db()
 
 
-# --- ROUTES FLASK ---
+# --- ROUTES ---
 @app.get("/")
 @app.get("/dashboard")
 def dashboard():
     runs = list_runs(limit=10)
     last_run = runs[0] if runs else None
-    return render_template("dashboard.html", runs=runs, last_run=last_run)
+    return render_template(
+        "dashboard.html", runs=runs, last_run=last_run
+    )
 
 
 @app.get("/run")
